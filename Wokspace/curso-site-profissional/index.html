@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> IntegraSaúde - Cursos</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand" onclick="location.href='index.html'">
+    <img src="img/logo.png" alt="logo" class="logo"/>
+    <span>IntegraSaúde </span>
+  </div>
+  <nav class="nav">
+    <a href="index.html">Início</a>
+    <a href="perfil.html">Perfil</a>
+    <a href="login.html" id="loginLink">Login</a>
+    <button class="btn small" id="logoutBtn" onclick="logout()" style="display:none">Sair</button>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>Aprenda no seu ritmo</h1>
+  <p>Videoaulas objetivas, certificação automática e acesso vitalício.</p>
+  <a class="btn" href="login.html">Começar agora</a>
+</section>
+
+<main class="container">
+  <h2 class="section-title">Cursos disponíveis</h2>
+  
+
+    <article class="card">
+      <img src="img/css.png" alt="Curso CSS"/>
+      <div class="card-body">
+        <h3>Sistema Único de Saúde -  SUS</h3>
+        <p>Introdução</p>
+        <div class="card-actions">
+          <button class="btn outline" onclick="inscreverCurso('CSS')">Inscrever-se</button>
+          <a class="btn" href="cursos/curso-css.html">Acessar curso</a>
+        </div>
+      </div>
+    </article>
+</main>
+
+<footer class="footer">
+  <p>© <span id="year"></span> Escola da Saúde Barueri — Todos os direitos reservados.</p>
+</footer>
+
+<script src="script.js"></script>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+  // Mostrar/ocultar login/logout
+  const u = getUsuario();
+  if (u) {
+    document.getElementById('loginLink').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = 'inline-block';
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Integra Saúde </title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand" onclick="location.href='../index.html'">
+    <img src="../img/logo.png" alt="logo" class="logo"/>
+    <span>IntegraSaúde</span>
+  </div>
+  <nav class="nav">
+    <a href="../index.html">Início</a>
+    <a href="../perfil.html">Perfil</a>
+  </nav>
+</header>
+
+<main class="container">
+  <article class="course">
+    <header>
+      <h1>Sistema Único de Saúde - SUS </h1>
+      <p class="muted">Introdução</p>
+    </header>
+
+    <div class="player">
+      <video id="player" controls preload="metadata" src="../videos/css.mp4">
+        Seu navegador não suporta o elemento de vídeo.
+      </video>
+      <p class="muted small">Substitua o arquivo em <code>videos/css.mp4</code> pelo seu .mp4.</p>
+    </div>
+
+    <div class="course-actions">
+      <button class="btn" onclick="concluirCurso('CSS')">Concluir curso</button>
+    </div>
+  </article>
+</main>
+
+<footer class="footer">
+  <a href="../index.html">← Voltar</a>
+</footer>
+
+<script src="../script.js"></script>
+<script>
+  // Proteção: exige login
+  const u = getUsuario();
+  if (!u) { 
+    document.body.innerHTML = '<main class="container"><div class="panel"><h2>Você precisa estar logado para acessar este curso.</h2><a class="btn" href="../login.html">Fazer login</a></div></main>';
+  }
+</script>
+</body>
+</html>

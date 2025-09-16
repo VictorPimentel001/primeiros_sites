@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu Perfil — IntegraSaúde</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand" onclick="location.href='index.html'">
+    <img src="img/logo.png" alt="logo" class="logo"/>
+    <span>IntegraSaúde </span>
+  </div>
+  <nav class="nav">
+    <a href="index.html">Início</a>
+    <button class="btn small" onclick="logout()">Sair</button>
+  </nav>
+</header>
+
+<main class="container">
+  <h1>Meu Perfil</h1>
+  <section id="dadosUsuario" class="panel"></section>
+
+  <div class="cols">
+    <section class="panel">
+      <h2>Cursos inscritos</h2>
+      <ul id="listaInscritos" class="list"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>Certificados</h2>
+      <ul id="listaCertificados" class="list"></ul>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <a href="index.html">← Voltar para o início</a>
+</footer>
+
+<script src="script.js"></script>
+<script>
+  renderPerfil();
+</script>
+</body>
+</html>
