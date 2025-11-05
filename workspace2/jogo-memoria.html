@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jogo da Memória 🧠</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #181818;
+      color: #fff;
+      font-family: 'Poppins', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    #start-screen {
+      text-align: center;
+    }
+
+    #start-btn {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    #start-btn:hover {
+      background-color: #43a047;
+      transform: scale(1.05);
+    }
+
+    #game-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #info {
+      margin-bottom: 15px;
+      display: flex;
+      gap: 25px;
+      font-size: 1.1rem;
+    }
+
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(4, 80px);
+      grid-gap: 12px;
+      justify-content: center;
+    }
+
+    .card {
+      width: 80px;
+      height: 80px;
+      background-color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s ease, background-color 0.3s;
+      transform-style: preserve-3d;
+      user-select: none;
+    }
+
+    .card.flipped {
+      background-color: #fff;
+      color: #000;
+      transform: rotateY(180deg);
+    }
+
+    .card.matched {
+      background-color: #4caf50;
+      color: white;
+      transform: scale(1.05);
+      cursor: default;
+    }
+
+    #restart-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      background-color: #2196f3;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+
+    #restart-btn:hover {
+      background-color: #1976d2;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen">
+    <h1>🧠 Jogo da Memória com Emojis</h1>
+    <p>Teste sua memória e encontre todos os pares!</p>
+    <button id="start-btn">Começar Jogo ▶️</button>
+  </div>
+
+  <div id="game-container">
+    <h1>🧠 Jogo da Memória</h1>
+    <div id="info">
+      <div>⏱️ Tempo: <span id="timer">0</span>s</div>
+      <div>🎯 Jogadas: <span id="moves">0</span></div>
+    </div>
+
+    <div id="game-board"></div>
+
+    <button id="restart-btn">🔁 Reiniciar</button>
+  </div>
+
+  <!-- Sons -->
+  <audio id="sound-match" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_b57cdb2900.mp3?filename=correct-2-46134.mp3"></audio>
+  <audio id="sound-error" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_ded66f90a0.mp3?filename=wrong-47985.mp3"></audio>
+  <audio id="sound-win" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_1ce9aefeb2.mp3?filename=success-fanfare-trumpets-6185.mp3"></audio>
+
+  <script>
+    const emojis = ['🍎','🍌','🍇','🍓','🍉','🍒','🍋','🥝'];
+    let cards = [...emojis, ...emojis];
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+    let moves = 0;
+    let timer = 0;
+    let interval = null;
+    let gameStarted = false;
+
+    const board = document.getElementById('game-board');
+    const timerDisplay = document.getElementById('timer');
+    const movesDisplay = document.getElementById('moves');
+    const restartBtn = document.getElementById('restart-btn');
+    const startBtn = document.getElementById('start-btn');
+    const startScreen = document.getElementById('start-screen');
+    const gameContainer = document.getElementById('game-container');
+
+    const soundMatch = document.getElementById('sound-match');
+    const soundError = document.getElementById('sound-error');
+    const soundWin = document.getElementById('sound-win');
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function createBoard() {
+      board.innerHTML = '';
+      shuffle(cards);
+      cards.forEach((emoji) => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.dataset.emoji = emoji;
+        card.textContent = '❓';
+        card.addEventListener('click', flipCard);
+        board.appendChild(card);
+      });
+
+      resetGame();
+    }
+
+    function flipCard() {
+      if (lockBoard) return;
+      if (this === firstCard) return;
+
+      if (!gameStarted) {
+        startTimer();
+        gameStarted = true;
+      }
+
+      this.classList.add('flipped');
+      this.textContent = this.dataset.emoji;
+
+      if (!firstCard) {
+        firstCard = this;
+        return;
+      }
+
+      secondCard = this;
+      moves++;
+      movesDisplay.textContent = moves;
+      checkForMatch();
+    }
+
+    function checkForMatch() {
+      const isMatch = firstCard.dataset.emoji === secondCard.dataset.emoji;
+      isMatch ? handleMatch() : handleNoMatch();
+    }
+
+    function handleMatch() {
+      soundMatch.play();
+      firstCard.classList.add('matched');
+      secondCard.classList.add('matched');
+      firstCard.removeEventListener('click', flipCard);
+      secondCard.removeEventListener('click', flipCard);
+      resetBoard();
+      checkWin();
+    }
+
+    function handleNoMatch() {
+      lockBoard = true;
+      soundError.play();
+      setTimeout(() => {
+        firstCard.classList.remove('flipped');
+        secondCard.classList.remove('flipped');
+        firstCard.textContent = '❓';
+        secondCard.textContent = '❓';
+        resetBoard();
+      }, 800);
+    }
+
+    function resetBoard() {
+      [firstCard, secondCard, lockBoard] = [null, null, false];
+    }
+
+    function resetGame() {
+      moves = 0;
+      timer = 0;
+      gameStarted = false;
+      clearInterval(interval);
+      timerDisplay.textContent = 0;
+      movesDisplay.textContent = 0;
+    }
+
+    function startTimer() {
+      interval = setInterval(() => {
+        timer++;
+        timerDisplay.textContent = timer;
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(interval);
+    }
+
+    function checkWin() {
+      const matchedCards = document.querySelectorAll('.matched');
+      if (matchedCards.length === cards.length) {
+        stopTimer();
+        soundWin.play();
+        setTimeout(() => {
+          alert(`🎉 Parabéns! Você venceu em ${moves} jogadas e ${timer} segundos!`);
+        }, 500);
+      }
+    }
+
+    restartBtn.addEventListener('click', createBoard);
+    startBtn.addEventListener('click', () => {
+      startScreen.style.display = 'none';
+      gameContainer.style.display = 'flex';
+      createBoard();
+    });
+  </script>
+</body>
+</html>
+
